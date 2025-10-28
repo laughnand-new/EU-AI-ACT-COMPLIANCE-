@@ -86,12 +86,38 @@ MONGO_URL="mongodb://localhost:27017"
 DB_NAME="test_database"
 CORS_ORIGINS="*"
 EMERGENT_LLM_KEY=sk-emergent-c59DcC51b1180C37f8
+JWT_SECRET_KEY=apexforge-elite-quantum-secret-key-change-in-production
 ```
 
 ### Frontend (.env)
 ```bash
 REACT_APP_BACKEND_URL=<configured_backend_url>
 ```
+
+## 👤 Authentication & Access
+
+### Founder Account
+The platform is protected with email/password authentication. A founder account is automatically created on first startup:
+
+**Founder Credentials:**
+- **Email**: laughnand@gmail.com
+- **Default Password**: founder123
+- **Role**: Founder (full access)
+
+⚠️ **Important**: Change the default password after first login for security.
+
+### User Management
+- **JWT-based authentication** with 7-day token expiration
+- **Password hashing** using bcrypt
+- **Protected routes** - all platform features require authentication
+- **Role-based access** - founder role for admin features
+
+### Authentication Flow
+1. Visit the platform URL
+2. Login page appears automatically
+3. Use founder credentials or create a new account
+4. Access full platform features after authentication
+5. Logout available from sidebar
 
 ## 🚀 Getting Started
 
