@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import AssetGenerator from '@/pages/AssetGenerator';
 import AssetLibrary from '@/pages/AssetLibrary';
 import AssetDetail from '@/pages/AssetDetail';
 import MarketIntelligence from '@/pages/MarketIntelligence';
 import Analytics from '@/pages/Analytics';
-import { Cpu, BarChart3, Lightbulb, FolderOpen, TrendingUp } from 'lucide-react';
+import { Cpu, BarChart3, Lightbulb, FolderOpen, TrendingUp, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import '@/App.css';
 
 const Navigation = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
   
   const navItems = [
     { path: '/', icon: BarChart3, label: 'Dashboard' },
@@ -57,14 +63,29 @@ const Navigation = () => {
         })}
       </div>
       
+      {/* User Info & Logout */}
       <div className="p-4 border-t border-slate-700">
-        <div className="bg-slate-800 rounded-lg p-4">
+        <div className="bg-slate-800 rounded-lg p-4 mb-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-400 text-sm">System Status</span>
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-slate-400 text-sm">Logged in as</span>
+            {user?.role === 'founder' && (
+              <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded">Founder</span>
+            )}
           </div>
-          <p className="text-white text-xs font-mono">Operational</p>
+          <p className="text-white text-sm font-medium truncate">{user?.email}</p>
+          {user?.full_name && (
+            <p className="text-slate-400 text-xs mt-1">{user.full_name}</p>
+          )}
         </div>
+        
+        <Button
+          onClick={logout}
+          data-testid="logout-button"
+          className="w-full bg-red-600 hover:bg-red-700 text-white"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
       </div>
     </nav>
   );
@@ -90,11 +111,21 @@ const AppContent = () => {
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/*" element={
+              <ProtectedRoute>
+                <AppContent />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </AuthProvider>
   );
 }
 
