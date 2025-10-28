@@ -634,6 +634,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize founder account on startup"""
+    founder_email = "laughnand@gmail.com"
+    
+    # Check if founder exists
+    existing_founder = await db.users.find_one({"email": founder_email}, {"_id": 0})
+    
+    if not existing_founder:
+        # Create founder account with default password
+        founder = User(
+            email=founder_email,
+            hashed_password=hash_password("founder123"),  # Default password - should be changed
+            full_name="Founder",
+            role="founder"
+        )
+        
+        doc = founder.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.users.insert_one(doc)
+        
+        logger.info(f"✅ Founder account created: {founder_email}")
+        logger.info("⚠️  Default password: founder123 (Please change after first login)")
+    else:
+        logger.info(f"✅ Founder account already exists: {founder_email}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
