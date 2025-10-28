@@ -61,22 +61,27 @@ A sophisticated AI-powered asset generation platform that implements the "black 
 
 ## 📊 API Endpoints
 
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login with email/password
+- `GET /api/auth/me` - Get current user info (requires auth)
+
 ### Asset Management
 - `GET /api/asset-types` - Get available asset types
-- `POST /api/assets/generate` - Generate new asset
-- `GET /api/assets` - List all assets
-- `GET /api/assets/{id}` - Get specific asset
-- `PATCH /api/assets/{id}/status` - Update asset status
-- `DELETE /api/assets/{id}` - Delete asset
+- `POST /api/assets/generate` - Generate new asset (requires auth)
+- `GET /api/assets` - List all assets (requires auth)
+- `GET /api/assets/{id}` - Get specific asset (requires auth)
+- `PATCH /api/assets/{id}/status` - Update asset status (requires auth)
+- `DELETE /api/assets/{id}` - Delete asset (requires auth)
 
 ### Market Intelligence
-- `POST /api/market/analyze` - Analyze market
-- `GET /api/market/insights` - Get stored insights
+- `POST /api/market/analyze` - Analyze market (requires auth)
+- `GET /api/market/insights` - Get stored insights (requires auth)
 
 ### Analytics
-- `GET /api/dashboard/stats` - Get dashboard statistics
-- `POST /api/assets/{id}/metrics` - Track performance metric
-- `GET /api/assets/{id}/metrics` - Get asset metrics
+- `GET /api/dashboard/stats` - Get dashboard statistics (requires auth)
+- `POST /api/assets/{id}/metrics` - Track performance metric (requires auth)
+- `GET /api/assets/{id}/metrics` - Get asset metrics (requires auth)
 
 ## 🔑 Environment Configuration
 
