@@ -14,6 +14,9 @@ from auth import (
     User, UserRegister, UserLogin, UserResponse, TokenResponse,
     hash_password, verify_password, create_access_token, get_current_user
 )
+import asyncio
+from market_intelligence import MarketIntelligenceEngine
+from websocket_manager import ws_manager
 
 
 ROOT_DIR = Path(__file__).parent
