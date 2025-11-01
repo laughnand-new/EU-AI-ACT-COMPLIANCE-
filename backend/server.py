@@ -425,10 +425,13 @@ async def get_asset_types():
 async def get_market_trends(
     limit: int = 20,
     category: Optional[str] = None,
-    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Get real-time market trends"""
     global market_engine
+    
+    # Verify auth
+    current_user = await get_current_user(credentials, db)
     
     if not market_engine:
         raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
@@ -451,10 +454,13 @@ async def get_market_trends(
 
 @api_router.get("/intelligence/stats")
 async def get_intelligence_stats(
-    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Get market intelligence dashboard statistics"""
     global market_engine
+    
+    # Verify auth
+    current_user = await get_current_user(credentials, db)
     
     if not market_engine:
         raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
@@ -468,10 +474,13 @@ async def get_intelligence_stats(
 
 @api_router.post("/intelligence/analyze")
 async def trigger_analysis(
-    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Manually trigger market analysis cycle"""
     global market_engine
+    
+    # Verify auth
+    current_user = await get_current_user(credentials, db)
     
     if not market_engine:
         raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
@@ -490,10 +499,13 @@ async def trigger_analysis(
 @api_router.post("/intelligence/generate-from-trend")
 async def generate_from_trend(
     trend_id: str,
-    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Generate a product from a market trend"""
     global market_engine
+    
+    # Verify auth
+    current_user = await get_current_user(credentials, db)
     
     if not market_engine:
         raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
