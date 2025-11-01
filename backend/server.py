@@ -645,7 +645,9 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize founder account on startup"""
+    """Initialize founder account and start market intelligence on startup"""
+    global market_engine
+    
     founder_email = "laughnand@gmail.com"
     
     # Check if founder exists
@@ -668,6 +670,21 @@ async def startup_event():
         logger.info("⚠️  Default password: founder123 (Please change after first login)")
     else:
         logger.info(f"✅ Founder account already exists: {founder_email}")
+    
+    # Initialize market intelligence engine
+    try:
+        market_engine = MarketIntelligenceEngine()
+        await market_engine.connect()
+        
+        # Start WebSocket background tasks
+        await ws_manager.start_background_tasks()
+        
+        # Start market monitoring in background
+        asyncio.create_task(market_engine.start_continuous_monitoring(interval_minutes=15))
+        
+        logger.info("🚀 Market Intelligence Engine started")
+    except Exception as e:
+        logger.error(f"Failed to start Market Intelligence: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
