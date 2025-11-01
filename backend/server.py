@@ -13,8 +13,10 @@ from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from auth import (
     User, UserRegister, UserLogin, UserResponse, TokenResponse,
-    hash_password, verify_password, create_access_token, get_current_user
+    hash_password, verify_password, create_access_token, get_current_user,
+    security
 )
+from fastapi.security import HTTPAuthorizationCredentials
 import asyncio
 from market_intelligence import MarketIntelligenceEngine
 from websocket_manager import ws_manager
