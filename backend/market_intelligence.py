@@ -118,8 +118,8 @@ class MarketIntelligenceEngine:
     
     def categorize_trend(self, trend: Dict[str, Any]) -> str:
         """Categorize trend into opportunity type"""
-        title = trend.get('title', '').lower()
-        description = trend.get('description', '').lower()
+        title = (trend.get('title') or '').lower()
+        description = (trend.get('description') or '').lower()
         text = f"{title} {description}"
         
         # Simple keyword-based categorization
