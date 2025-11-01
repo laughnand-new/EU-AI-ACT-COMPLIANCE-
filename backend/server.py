@@ -30,8 +30,14 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI()
 
+# Mount WebSocket at /ws
+app.mount("/ws", ws_manager.get_asgi_app())
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Global market intelligence engine
+market_engine = None
 
 
 # ================== DATA MODELS ==================
