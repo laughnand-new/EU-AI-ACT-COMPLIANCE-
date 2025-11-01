@@ -417,6 +417,155 @@ async def get_asset_types():
     ]
     return asset_types
 
+
+# ================== MARKET INTELLIGENCE ROUTES ==================
+
+@api_router.get("/intelligence/trends")
+async def get_market_trends(
+    limit: int = 20,
+    category: Optional[str] = None,
+    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+):
+    """Get real-time market trends"""
+    global market_engine
+    
+    if not market_engine:
+        raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
+    
+    try:
+        trends = await market_engine.get_top_trends(limit)
+        
+        # Filter by category if specified
+        if category:
+            trends = [t for t in trends if t['analysis']['category'] == category]
+        
+        return {
+            "trends": trends,
+            "total": len(trends),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting trends: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/intelligence/stats")
+async def get_intelligence_stats(
+    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+):
+    """Get market intelligence dashboard statistics"""
+    global market_engine
+    
+    if not market_engine:
+        raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
+    
+    try:
+        stats = await market_engine.get_dashboard_stats()
+        return stats
+    except Exception as e:
+        logger.error(f"Error getting stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/intelligence/analyze")
+async def trigger_analysis(
+    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+):
+    """Manually trigger market analysis cycle"""
+    global market_engine
+    
+    if not market_engine:
+        raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
+    
+    try:
+        # Run analysis in background
+        asyncio.create_task(market_engine.run_analysis_cycle())
+        return {
+            "message": "Analysis cycle triggered",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error triggering analysis: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/intelligence/generate-from-trend")
+async def generate_from_trend(
+    trend_id: str,
+    current_user: dict = Depends(lambda creds: get_current_user(creds, db))
+):
+    """Generate a product from a market trend"""
+    global market_engine
+    
+    if not market_engine:
+        raise HTTPException(status_code=503, detail="Market Intelligence Engine not available")
+    
+    try:
+        # Get trend from Redis
+        import redis.asyncio as redis
+        redis_client = await redis.from_url('redis://localhost:6379', decode_responses=True)
+        trend_data = await redis_client.get(f"trend:{trend_id}")
+        await redis_client.close()
+        
+        if not trend_data:
+            raise HTTPException(status_code=404, detail="Trend not found")
+        
+        trend = json.loads(trend_data)
+        
+        # Build generation prompt from trend
+        original = trend['original']
+        analysis = trend['analysis']
+        
+        prompt = f"""Generate a product based on this market opportunity:
+
+Trend: {original['title']}
+Description: {original['description']}
+Category: {analysis['category']}
+Opportunity Score: {analysis['trend_score']}/100
+Revenue Potential: ${analysis['revenue_potential']:,}
+Urgency: {analysis['urgency']}/10
+
+Create a compelling product that:
+1. Addresses the market need identified in this trend
+2. Targets the identified audience
+3. Leverages the momentum of this trend
+4. Focuses on quick time-to-market for maximum opportunity capture
+"""
+        
+        # Generate using AI service
+        generated = await ai_service.generate_asset(
+            asset_type="saas_product",
+            prompt=prompt,
+            target_audience=analysis['category'],
+            industry="Market-Driven Opportunity"
+        )
+        
+        # Create asset object
+        asset = Asset(
+            asset_type="saas_product",
+            title=generated["title"],
+            content=generated["content"],
+            description=generated["description"],
+            prompt=prompt,
+            target_audience=analysis['category'],
+            industry="Market-Driven"
+        )
+        
+        # Save to database with trend reference
+        doc = asset.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        doc['trend_id'] = trend_id
+        doc['trend_score'] = analysis['trend_score']
+        await db.assets.insert_one(doc)
+        
+        return {
+            "asset": asset,
+            "trend": trend,
+            "message": "Product generated from market trend"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating from trend: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Asset Generation
 @api_router.post("/assets/generate", response_model=Asset)
 async def generate_asset(request: GenerateAssetRequest):
