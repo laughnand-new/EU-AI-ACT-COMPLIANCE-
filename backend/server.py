@@ -688,4 +688,15 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    global market_engine
+    
+    # Stop market intelligence
+    if market_engine:
+        market_engine.stop_monitoring()
+        await market_engine.disconnect()
+    
+    # Stop WebSocket
+    await ws_manager.stop_background_tasks()
+    
+    # Close MongoDB
     client.close()
