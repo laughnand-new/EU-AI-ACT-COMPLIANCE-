@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ApexForge Login Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f0f10;
+            color: #fff;
+        }
+        .container {
+            background: #1a1a1b;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        h1 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #0f0f10;
+            color: #fff;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .success {
+            background: #10b981;
+            border: 1px solid #059669;
+        }
+        .error {
+            background: #ef4444;
+            border: 1px solid #dc2626;
+        }
+        .info {
+            background: #3b82f6;
+            border: 1px solid #2563eb;
+            margin-bottom: 20px;
+        }
+        pre {
+            background: #0f0f10;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 ApexForge Elite - Login Test</h1>
+        
+        <div class="info">
+            <strong>Default Credentials:</strong><br>
+            Email: laughnand@gmail.com<br>
+            Password: founder123
+        </div>
+        
+        <form id="loginForm">
+            <input 
+                type="email" 
+                id="email" 
+                placeholder="Email" 
+                value="laughnand@gmail.com"
+                required
+            >
+            <input 
+                type="password" 
+                id="password" 
+                placeholder="Password" 
+                value="founder123"
+                required
+            >
+            <button type="submit">🚀 Login</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const BACKEND_URL = window.location.origin;
+        const resultDiv = document.getElementById('result');
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            resultDiv.innerHTML = '<div class="info">⏳ Logging in...</div>';
+            
+            try {
+                console.log('Attempting login to:', `${BACKEND_URL}/api/auth/login`);
+                
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok && data.access_token) {
+                    // Store token
+                    localStorage.setItem('auth_token', data.access_token);
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Login Successful!</h3>
+                            <p><strong>Email:</strong> ${data.user.email}</p>
+                            <p><strong>Role:</strong> ${data.user.role}</p>
+                            <p><strong>Name:</strong> ${data.user.full_name}</p>
+                            <p><strong>Token (first 50):</strong><br>
+                            <pre>${data.access_token.substring(0, 50)}...</pre></p>
+                            <p style="margin-top: 15px;">
+                                <button onclick="window.location.href='/'">→ Go to Dashboard</button>
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Login Failed</h3>
+                            <p>${data.detail || JSON.stringify(data)}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                        <p>Check browser console for details (F12)</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                resultDiv.innerHTML = `
+                    <div class="info">
+                        <p>ℹ️ You have a saved token</p>
+                        <p style="margin-top: 10px;">
+                            <button onclick="window.location.href='/'">→ Go to Dashboard</button>
+                            <button onclick="localStorage.clear(); location.reload()">🗑️ Clear & Retry</button>
+                        </p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
