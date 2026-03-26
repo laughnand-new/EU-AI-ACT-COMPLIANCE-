@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ApexForge Advanced Login Diagnostics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f10 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: rgba(26, 26, 30, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .account-option {
+            background: #1a1a1b;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .account-option:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+        .account-option.selected {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+        .account-name {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #60a5fa;
+        }
+        .account-details {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .account-details div {
+            margin: 4px 0;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #0f0f10;
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .log-container {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .log-entry {
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 3px solid #333;
+            padding-left: 12px;
+        }
+        .log-info { border-left-color: #60a5fa; color: #60a5fa; }
+        .log-success { border-left-color: #10b981; color: #10b981; }
+        .log-error { border-left-color: #ef4444; color: #ef4444; }
+        .log-warn { border-left-color: #f59e0b; color: #f59e0b; }
+        .timestamp {
+            color: #666;
+            font-size: 11px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.show { display: block; }
+        .result.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+        }
+        .result.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+        }
+        .token-display {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔬 ApexForge Login Diagnostics</h1>
+            <p class="subtitle">Advanced debugging and testing tool</p>
+            
+            <div id="accountSelect">
+                <h3 style="color: #60a5fa; margin-bottom: 15px;">Select Account:</h3>
+                
+                <div class="account-option" data-email="jefecyou@gmail.com" data-password="apexforge123">
+                    <div class="account-name">👤 Your Account (Dylan)</div>
+                    <div class="account-details">
+                        <div>📧 Email: jefecyou@gmail.com</div>
+                        <div>🔑 Password: apexforge123</div>
+                        <div>👔 Role: User</div>
+                    </div>
+                </div>
+                
+                <div class="account-option" data-email="laughnand@gmail.com" data-password="founder123">
+                    <div class="account-name">👑 Founder Account</div>
+                    <div class="account-details">
+                        <div>📧 Email: laughnand@gmail.com</div>
+                        <div>🔑 Password: founder123</div>
+                        <div>👔 Role: Founder</div>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="loginForm" style="margin-top: 20px;">
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="Email Address" 
+                    value="jefecyou@gmail.com"
+                    required
+                >
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Password" 
+                    value="apexforge123"
+                    required
+                >
+                <button type="submit" id="loginBtn">🚀 Login & Diagnose</button>
+            </form>
+            
+            <div id="result" class="result"></div>
+        </div>
+        
+        <div class="card">
+            <h3 style="color: #60a5fa; margin-bottom: 15px;">📋 Debug Log</h3>
+            <div id="logContainer" class="log-container">
+                <div class="log-entry log-info">
+                    <span class="timestamp">Ready</span> - Diagnostic tool initialized
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const BACKEND_URL = window.location.origin;
+        const logContainer = document.getElementById('logContainer');
+        const resultDiv = document.getElementById('result');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        // Account selection
+        document.querySelectorAll('.account-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.account-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('email').value = this.dataset.email;
+                document.getElementById('password').value = this.dataset.password;
+                log('info', `Selected account: ${this.dataset.email}`);
+            });
+        });
+        
+        // Select first account by default
+        document.querySelector('.account-option').click();
+        
+        function log(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function showResult(success, data) {
+            resultDiv.className = `result show ${success ? 'success' : 'error'}`;
+            resultDiv.innerHTML = data;
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('info', '🔄 Starting login process...');
+            log('info', `Email: ${email}`);
+            log('info', `Backend URL: ${BACKEND_URL}/api/auth/login`);
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Logging in...';
+            resultDiv.className = 'result';
+            
+            try {
+                // Step 1: Check backend connectivity
+                log('info', '📡 Step 1: Testing backend connectivity...');
+                const healthCheck = await fetch(`${BACKEND_URL}/api/`);
+                log('success', `✅ Backend is reachable (Status: ${healthCheck.status})`);
+                
+                // Step 2: Attempt login
+                log('info', '🔐 Step 2: Attempting login...');
+                const startTime = Date.now();
+                
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const responseTime = Date.now() - startTime;
+                log('info', `⏱️ Response time: ${responseTime}ms`);
+                log('info', `📊 Response status: ${response.status} ${response.statusText}`);
+                
+                // Step 3: Parse response
+                const data = await response.json();
+                log('info', '📦 Step 3: Parsing response...');
+                
+                if (response.ok && data.access_token) {
+                    log('success', '✅ Login successful!');
+                    log('success', `User: ${data.user.email}`);
+                    log('success', `Role: ${data.user.role}`);
+                    log('success', `Token length: ${data.access_token.length} characters`);
+                    
+                    // Store token
+                    localStorage.setItem('auth_token', data.access_token);
+                    log('success', '💾 Token saved to localStorage');
+                    
+                    showResult(true, `
+                        <h2 style="color: #10b981;">✅ Login Successful!</h2>
+                        <div style="margin-top: 15px;">
+                            <p><strong>Email:</strong> ${data.user.email}</p>
+                            <p><strong>Name:</strong> ${data.user.full_name}</p>
+                            <p><strong>Role:</strong> ${data.user.role}</p>
+                            <p><strong>Status:</strong> ${data.user.is_active ? 'Active' : 'Inactive'}</p>
+                        </div>
+                        <div class="token-display">
+                            <strong>Token:</strong><br>
+                            ${data.access_token.substring(0, 100)}...
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="window.location.href='/'">→ Go to Dashboard</button>
+                            <button onclick="testToken()">🔍 Test Token</button>
+                        </div>
+                    `);
+                    
+                } else {
+                    log('error', `❌ Login failed: ${response.status}`);
+                    log('error', `Error: ${data.detail || JSON.stringify(data)}`);
+                    
+                    showResult(false, `
+                        <h2 style="color: #ef4444;">❌ Login Failed</h2>
+                        <p style="margin-top: 15px;"><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                        <p><strong>Error:</strong> ${data.detail || 'Unknown error'}</p>
+                        <div class="token-display">
+                            ${JSON.stringify(data, null, 2)}
+                        </div>
+                    `);
+                }
+                
+            } catch (error) {
+                log('error', `❌ Critical error: ${error.message}`);
+                log('error', `Stack: ${error.stack}`);
+                
+                showResult(false, `
+                    <h2 style="color: #ef4444;">❌ Connection Error</h2>
+                    <p style="margin-top: 15px;"><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Type:</strong> ${error.name}</p>
+                    <p style="margin-top: 10px;">This usually means:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Backend is not running</li>
+                        <li>CORS issue</li>
+                        <li>Network connectivity problem</li>
+                    </ul>
+                `);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🚀 Login & Diagnose';
+            }
+        });
+        
+        async function testToken() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                log('error', '❌ No token found in localStorage');
+                return;
+            }
+            
+            log('info', '🔍 Testing token validity...');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('success', '✅ Token is valid!');
+                    log('success', `Verified user: ${data.email}`);
+                } else {
+                    log('error', '❌ Token is invalid or expired');
+                }
+            } catch (error) {
+                log('error', `❌ Token test failed: ${error.message}`);
+            }
+        }
+        
+        // Auto-clear old logs
+        setInterval(() => {
+            const entries = logContainer.querySelectorAll('.log-entry');
+            if (entries.length > 50) {
+                entries[0].remove();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
