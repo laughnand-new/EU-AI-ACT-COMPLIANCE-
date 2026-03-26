@@ -1,21 +1,21 @@
-import redis.asyncio as redis
-import json
+import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import logging
 from data_sources.hackernews import HackerNewsSource
 from data_sources.github import GitHubTrendingSource
 from data_sources.producthunt import ProductHuntSource
-import asyncio
+from mongo_stores import MarketIntelligenceStore
 
 logger = logging.getLogger(__name__)
 
 class MarketIntelligenceEngine:
     """Core market intelligence engine with real-time analysis"""
     
-    def __init__(self, redis_url: str = 'redis://localhost:6379'):
-        self.redis_url = redis_url
-        self.redis_client = None
+    def __init__(self, mongo_url: str, db_name: str):
+        self.mongo_url = mongo_url
+        self.db_name = db_name
+        self.cache = MarketIntelligenceStore(mongo_url, db_name)
         
         # Initialize data sources
         self.sources = [
@@ -27,13 +27,12 @@ class MarketIntelligenceEngine:
         self.running = False
     
     async def connect(self):
-        """Connect to Redis"""
+        """Initialize MongoDB cache"""
         try:
-            self.redis_client = await redis.from_url(self.redis_url, decode_responses=True)
-            await self.redis_client.ping()
-            logger.info("✅ Connected to Redis")
+            await self.cache.initialize()
+            logger.info("✅ Connected to MongoDB cache")
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {str(e)}")
+            logger.error(f"Failed to initialize MongoDB cache: {str(e)}")
             raise
     
     async def disconnect(self):
