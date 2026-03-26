@@ -1,0 +1,24 @@
+{
+  "name": "phase-xi-sovereign-substrate",
+  "version": "1.0.0",
+  "description": "Phase XI Sovereign Substrate - Deterministic Governance Layer",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "test": "ts-node index.ts"
+  },
+  "keywords": [
+    "phase-xi",
+    "substrate",
+    "deterministic",
+    "governance",
+    "sovereign"
+  ],
+  "author": "ApexForge",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}
