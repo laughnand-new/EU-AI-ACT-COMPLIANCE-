@@ -73,7 +73,8 @@ console.log(`Client1 trust status: ${TrustStateLayer.getTrustStatus(client1.id)}
 console.log(`Client2 trust status: ${TrustStateLayer.getTrustStatus(client2.id)}`);
 
 const client1Record = TrustStateLayer.getTrustRecord(client1.id);
-if (client1Record) {\n  console.log(`Client1 revoked at: ${new Date(client1Record.revokedAt!).toISOString()}`);
+if (client1Record) {
+  console.log(`Client1 revoked at: ${new Date(client1Record.revokedAt!).toISOString()}`);
   console.log(`Client1 revoked by: ${client1Record.revokedBy}`);
 }
 console.log("");
