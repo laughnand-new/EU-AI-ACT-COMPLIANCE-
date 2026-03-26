@@ -4,6 +4,8 @@ import { PhaseXISubstrate } from "../substrate/substrate";
 import { Identity } from "../substrate/identity";
 import { InsightWeaver } from "../substrate/insightweaver";
 
+export { PhaseXISubstrate } from "../substrate/substrate";
+
 export class SubstrateAPI {
   static perform(operation: string, payload: any, origin: "founder" | "system" | "client") {
     const actor = Identity.create(origin);
